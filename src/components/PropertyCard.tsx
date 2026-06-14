@@ -62,11 +62,11 @@ export default function PropertyCard({ property, onCalendarOpen }: PropertyCardP
         <div className="flex items-center gap-3 mb-2 text-earth-500 text-sm">
           <span className="flex items-center gap-1">
             <BedDouble className="w-3.5 h-3.5" />
-            {property.bedrooms}室
+            {property.bedrooms || 0}室
           </span>
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" />
-            最多{property.maxGuests}人
+            最多{property.maxGuests || 0}人
           </span>
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
@@ -82,7 +82,7 @@ export default function PropertyCard({ property, onCalendarOpen }: PropertyCardP
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-earth-500 font-bold text-xl">¥{property.basePrice}</span>
+            <span className="text-earth-500 font-bold text-xl">¥{Number(property.basePrice) || 0}</span>
             <span className="text-earth-400 text-sm">/晚</span>
           </div>
           <div className="flex items-center gap-2">

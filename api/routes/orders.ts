@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { db, parseJsonField } from '../database.js'
+import { db, parseJsonField, toCamelCase, toCamelCaseArray } from '../database.js'
 
 const router = Router()
 
@@ -91,8 +91,8 @@ router.post('/', (req: Request, res: Response): void => {
     res.status(201).json({
       success: true,
       data: {
-        ...order,
-        extra_services: parseJsonField<ExtraService[]>(order.extra_services as string, [])
+        ...toCamelCase(order),
+        extraServices: parseJsonField<ExtraService[]>(order.extra_services as string, [])
       }
     })
   } catch (error) {
@@ -117,8 +117,8 @@ router.get('/', (req: Request, res: Response): void => {
     const rows = db.prepare(sql).all(...params) as Array<Record<string, unknown>>
 
     const results = rows.map(row => ({
-      ...row,
-      extra_services: parseJsonField<ExtraService[]>(row.extra_services as string, [])
+      ...toCamelCase(row),
+      extraServices: parseJsonField<ExtraService[]>(row.extra_services as string, [])
     }))
 
     res.json({ success: true, data: results })
@@ -142,8 +142,8 @@ router.get('/:id', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...row,
-        extra_services: parseJsonField<ExtraService[]>(row.extra_services as string, [])
+        ...toCamelCase(row),
+        extraServices: parseJsonField<ExtraService[]>(row.extra_services as string, [])
       }
     })
   } catch (error) {
@@ -206,8 +206,8 @@ router.put('/:id/cancel', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...updated,
-        extra_services: parseJsonField<ExtraService[]>(updated.extra_services as string, []),
+        ...toCamelCase(updated),
+        extraServices: parseJsonField<ExtraService[]>(updated.extra_services as string, []),
         penaltyRate,
         penaltyAmount,
         refundAmount: totalAmount - penaltyAmount,
@@ -265,8 +265,8 @@ router.put('/:id/modify', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...updated,
-        extra_services: parseJsonField<ExtraService[]>(updated.extra_services as string, [])
+        ...toCamelCase(updated),
+        extraServices: parseJsonField<ExtraService[]>(updated.extra_services as string, [])
       }
     })
   } catch (error) {
@@ -322,8 +322,8 @@ router.put('/:id/checkin', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...updated,
-        extra_services: parseJsonField<ExtraService[]>(updated.extra_services as string, []),
+        ...toCamelCase(updated),
+        extraServices: parseJsonField<ExtraService[]>(updated.extra_services as string, []),
         checkInRecordId: recordId,
         cleaningTaskId: cleaningId
       }
@@ -359,8 +359,8 @@ router.put('/:id/complete', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...updated,
-        extra_services: parseJsonField<ExtraService[]>(updated.extra_services as string, [])
+        ...toCamelCase(updated),
+        extraServices: parseJsonField<ExtraService[]>(updated.extra_services as string, [])
       }
     })
   } catch (error) {

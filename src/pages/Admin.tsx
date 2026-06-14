@@ -289,7 +289,7 @@ function RevenueSection() {
             </div>
             <div>
               <p className="text-sm text-earth-400">总营收</p>
-              <p className="text-2xl font-bold text-earth-900">¥{revenueStats?.totalRevenue?.toLocaleString() ?? 0}</p>
+              <p className="text-2xl font-bold text-earth-900">¥{(revenueStats?.totalRevenue ?? 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ function RevenueSection() {
             </div>
             <div>
               <p className="text-sm text-earth-400">入住率</p>
-              <p className="text-2xl font-bold text-earth-900">{revenueStats?.occupancyRate?.toFixed(1) ?? 0}%</p>
+              <p className="text-2xl font-bold text-earth-900">{(revenueStats?.occupancyRate ?? 0).toFixed(1)}%</p>
             </div>
           </div>
         </div>
@@ -311,7 +311,7 @@ function RevenueSection() {
             </div>
             <div>
               <p className="text-sm text-earth-400">平均房价</p>
-              <p className="text-2xl font-bold text-earth-900">¥{revenueStats?.avgPrice?.toLocaleString() ?? 0}</p>
+              <p className="text-2xl font-bold text-earth-900">¥{(revenueStats?.avgPrice ?? 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -345,7 +345,7 @@ function RevenueSection() {
             <div key={m.month} className="flex-1 flex flex-col items-center">
               <div
                 className="w-full bg-earth-400 rounded-t-md transition-all duration-200 hover:bg-earth-500"
-                style={{ height: `${(m.revenue / maxRevenue) * 100}%`, minHeight: "4px" }}
+                style={{ height: `${((m.revenue ?? 0) / maxRevenue) * 100}%`, minHeight: "4px" }}
               />
               <span className="text-xs text-earth-400 mt-1">{m.month}</span>
             </div>
@@ -367,8 +367,8 @@ function RevenueSection() {
                 <span className="text-earth-800 font-medium">{prop.name}</span>
               </div>
               <div className="text-right">
-                <span className="text-earth-500 font-bold">¥{prop.revenue.toLocaleString()}</span>
-                <span className="text-xs text-earth-400 ml-2">{prop.bookings}单</span>
+                <span className="text-earth-500 font-bold">¥{(prop.revenue ?? 0).toLocaleString()}</span>
+                <span className="text-xs text-earth-400 ml-2">{prop.bookings || 0}单</span>
               </div>
             </div>
           ))}

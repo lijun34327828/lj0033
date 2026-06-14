@@ -90,11 +90,11 @@ export default function OrderDetail() {
           </div>
           <div>
             <span className="text-sm text-earth-400">入住人数</span>
-            <p className="text-earth-800">{currentOrder.guests}人</p>
+            <p className="text-earth-800">{Number(currentOrder.guests) || 0}人</p>
           </div>
           <div>
             <span className="text-sm text-earth-400">订单金额</span>
-            <p className="text-earth-500 font-bold text-xl">¥{currentOrder.totalAmount}</p>
+            <p className="text-earth-500 font-bold text-xl">¥{Number(currentOrder.totalAmount) || 0}</p>
           </div>
         </div>
 
@@ -104,8 +104,8 @@ export default function OrderDetail() {
             <div className="space-y-1">
               {currentOrder.extraServices.map((s) => (
                 <div key={s.id} className="flex justify-between text-sm">
-                  <span className="text-earth-600">{s.name} × {s.quantity}</span>
-                  <span className="text-earth-800">¥{s.price * s.quantity}</span>
+                  <span className="text-earth-600">{s.name} × {Number(s.quantity) || 0}</span>
+                  <span className="text-earth-800">¥{(Number(s.price) || 0) * (Number(s.quantity) || 0)}</span>
                 </div>
               ))}
             </div>
@@ -188,19 +188,19 @@ export default function OrderDetail() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-earth-500">原金额</span>
-                <span>¥{penalty.originalAmount}</span>
+                <span>¥{Number(penalty.originalAmount) || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-earth-500">违约金率</span>
-                <span>{(penalty.penaltyRate * 100).toFixed(0)}%</span>
+                <span>{((Number(penalty.penaltyRate) || 0) * 100).toFixed(0)}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-earth-500">违约金</span>
-                <span className="text-crimson-500">¥{penalty.penaltyAmount}</span>
+                <span className="text-crimson-500">¥{Number(penalty.penaltyAmount) || 0}</span>
               </div>
               <div className="flex justify-between border-t pt-2">
                 <span className="text-earth-500">退款金额</span>
-                <span className="text-forest-500 font-semibold">¥{penalty.refundAmount}</span>
+                <span className="text-forest-500 font-semibold">¥{Number(penalty.refundAmount) || 0}</span>
               </div>
               <p className="text-xs text-earth-400 mt-2">规则：{penalty.rule}</p>
             </div>

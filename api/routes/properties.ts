@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { db, parseJsonField } from '../database.js'
+import { db, parseJsonField, toCamelCase, toCamelCaseArray } from '../database.js'
 
 const router = Router()
 
@@ -31,7 +31,7 @@ router.get('/', (req: Request, res: Response): void => {
     const rows = db.prepare(sql).all(...params) as Record<string, unknown>[]
 
     let results = rows.map(row => ({
-      ...row,
+      ...toCamelCase(row),
       amenities: parseJsonField<string[]>(row.amenities as string, []),
       images: parseJsonField<string[]>(row.images as string, [])
     }))
@@ -59,7 +59,7 @@ router.get('/:id', (req: Request, res: Response): void => {
     }
 
     const result = {
-      ...row,
+      ...toCamelCase(row),
       amenities: parseJsonField<string[]>(row.amenities as string, []),
       images: parseJsonField<string[]>(row.images as string, [])
     }
@@ -110,7 +110,7 @@ router.put('/:id', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...updated,
+        ...toCamelCase(updated),
         amenities: parseJsonField<string[]>(updated.amenities as string, []),
         images: parseJsonField<string[]>(updated.images as string, [])
       }

@@ -100,7 +100,7 @@ export default function Orders() {
                     {badge.label}
                   </span>
                 </div>
-                <span className="text-lg font-bold text-earth-500">¥{order.totalAmount}</span>
+                <span className="text-lg font-bold text-earth-500">¥{Number(order.totalAmount) || 0}</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                 <div>
@@ -190,19 +190,19 @@ export default function Orders() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-earth-500">原金额</span>
-                <span>¥{penalty.originalAmount}</span>
+                <span>¥{Number(penalty.originalAmount) || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-earth-500">违约金率</span>
-                <span>{(penalty.penaltyRate * 100).toFixed(0)}%</span>
+                <span>{((Number(penalty.penaltyRate) || 0) * 100).toFixed(0)}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-earth-500">违约金</span>
-                <span className="text-crimson-500">¥{penalty.penaltyAmount}</span>
+                <span className="text-crimson-500">¥{Number(penalty.penaltyAmount) || 0}</span>
               </div>
               <div className="flex justify-between border-t pt-2">
                 <span className="text-earth-500">退款金额</span>
-                <span className="text-forest-500 font-semibold">¥{penalty.refundAmount}</span>
+                <span className="text-forest-500 font-semibold">¥{Number(penalty.refundAmount) || 0}</span>
               </div>
               <p className="text-xs text-earth-400 mt-2">规则：{penalty.rule}</p>
             </div>

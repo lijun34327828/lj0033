@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { db } from '../database.js'
+import { db, toCamelCase, toCamelCaseArray } from '../database.js'
 
 const router = Router()
 
@@ -25,7 +25,7 @@ router.get('/', (req: Request, res: Response): void => {
 
     const rows = db.prepare(sql).all(...params) as Array<Record<string, unknown>>
 
-    res.json({ success: true, data: rows })
+    res.json({ success: true, data: toCamelCaseArray(rows) })
   } catch (error) {
     res.status(500).json({ success: false, error: '获取保洁任务列表失败' })
   }
@@ -61,7 +61,7 @@ router.post('/', (req: Request, res: Response): void => {
       WHERE ct.id = ?
     `).get(id) as Record<string, unknown>
 
-    res.status(201).json({ success: true, data: task })
+    res.status(201).json({ success: true, data: toCamelCase(task) })
   } catch (error) {
     res.status(500).json({ success: false, error: '创建保洁任务失败' })
   }
@@ -105,7 +105,7 @@ router.put('/:id', (req: Request, res: Response): void => {
       WHERE ct.id = ?
     `).get(req.params.id) as Record<string, unknown>
 
-    res.json({ success: true, data: updated })
+    res.json({ success: true, data: toCamelCase(updated) })
   } catch (error) {
     res.status(500).json({ success: false, error: '更新保洁任务失败' })
   }

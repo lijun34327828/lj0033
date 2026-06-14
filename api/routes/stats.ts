@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express'
-import { db } from '../database.js'
+import { db, toCamelCaseArray } from '../database.js'
 
 const router = Router()
 
@@ -25,7 +25,7 @@ router.get('/revenue', (req: Request, res: Response): void => {
       WHERE status IN ('checked_in', 'completed') AND check_in >= ?
     `).get(startDate) as { total: number }
 
-    const totalRevenue = totalRevenueRow.total
+    const totalRevenue = Number(totalRevenueRow.total)
 
     const totalProperties = (db.prepare('SELECT COUNT(*) as count FROM properties').get() as { count: number }).count
 
@@ -38,7 +38,7 @@ router.get('/revenue', (req: Request, res: Response): void => {
     `).get(startDate) as { nights: number }
 
     const occupancyRate = totalProperties > 0
-      ? Math.round((bookedNightsRow.nights / (totalProperties * daysInRange)) * 10000) / 100
+      ? Math.round((Number(bookedNightsRow.nights) / (totalProperties * daysInRange)) * 10000) / 100
       : 0
 
     const avgPriceRow = db.prepare(`
@@ -47,24 +47,36 @@ router.get('/revenue', (req: Request, res: Response): void => {
       WHERE status IN ('checked_in', 'completed') AND check_in >= ?
     `).get(startDate) as { avg: number }
 
-    const avgPrice = Math.round(avgPriceRow.avg * 100) / 100
+    const avgPrice = Math.round(Number(avgPriceRow.avg) * 100) / 100
 
-    const monthlyRevenue = db.prepare(`
+    const monthlyRevenueRaw = db.prepare(`
       SELECT strftime('%Y-%m', check_in) as month, COALESCE(SUM(total_amount), 0) as revenue
       FROM orders
       WHERE status IN ('checked_in', 'completed') AND check_in >= ?
       GROUP BY strftime('%Y-%m', check_in)
       ORDER BY month
-    `).all(startDate) as Array<{ month: string; revenue: number }>
+    `).all(startDate) as Array<Record<string, unknown>>
 
-    const topProperties = db.prepare(`
+    const monthlyRevenue = toCamelCaseArray<{ month: string; revenue: number }>(monthlyRevenueRaw).map(m => ({
+      month: m.month,
+      revenue: Number(m.revenue)
+    }))
+
+    const topPropertiesRaw = db.prepare(`
       SELECT p.id, p.name, COALESCE(SUM(o.total_amount), 0) as revenue, COUNT(o.id) as bookings
       FROM properties p
       LEFT JOIN orders o ON p.id = o.property_id AND o.status IN ('checked_in', 'completed') AND o.check_in >= ?
       GROUP BY p.id
       ORDER BY revenue DESC
       LIMIT 5
-    `).all(startDate) as Array<{ id: string; name: string; revenue: number; bookings: number }>
+    `).all(startDate) as Array<Record<string, unknown>>
+
+    const topProperties = toCamelCaseArray<{ id: string; name: string; revenue: number; bookings: number }>(topPropertiesRaw).map(p => ({
+      id: p.id,
+      name: p.name,
+      revenue: Number(p.revenue),
+      bookings: Number(p.bookings)
+    }))
 
     res.json({
       success: true,

@@ -285,4 +285,51 @@ export function formatDate(date: Date): string {
   return date.toISOString().slice(0, 10)
 }
 
+const NUMERIC_FIELDS = new Set([
+  'price', 'amount', 'revenue', 'guests', 'bedrooms', 'nights', 'rate', 'quantity',
+  'total', 'avg', 'occupancy', 'penalty', 'refund', 'deposit', 'fee', 'cost',
+  'basePrice', 'extraGuestPrice', 'maxGuests', 'baseGuests', 'totalRevenue',
+  'avgPrice', 'occupancyRate', 'actualAmount', 'totalAmount', 'originalAmount',
+  'penaltyAmount', 'refundAmount', 'penaltyRate'
+])
+
+export function toCamelCase<T = Record<string, unknown>>(obj: Record<string, unknown>): T {
+  const result: Record<string, unknown> = {}
+  for (const key of Object.keys(obj)) {
+    const camelKey = key.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
+    let value = obj[key]
+    
+    if (value === null || value === undefined) {
+      result[camelKey] = NUMERIC_FIELDS.has(camelKey) ? 0 : null
+      continue
+    }
+    
+    if (typeof value === 'string') {
+      if (value === '') {
+        result[camelKey] = NUMERIC_FIELDS.has(camelKey) ? 0 : ''
+        continue
+      }
+      const num = Number(value)
+      if (!isNaN(num) && Number.isFinite(num)) {
+        value = num
+      }
+    }
+    
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      value = 0
+    }
+    
+    if (NUMERIC_FIELDS.has(camelKey) && typeof value !== 'number') {
+      value = 0
+    }
+    
+    result[camelKey] = value
+  }
+  return result as T
+}
+
+export function toCamelCaseArray<T = Record<string, unknown>>(arr: Array<Record<string, unknown>>): T[] {
+  return arr.map((item) => toCamelCase<T>(item))
+}
+
 export { db }

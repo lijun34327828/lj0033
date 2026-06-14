@@ -59,7 +59,7 @@ export default function Records() {
                     <h3 className="font-serif text-lg font-semibold text-earth-900">
                       {record.guestName}
                     </h3>
-                    <span className="text-earth-500 font-bold">¥{record.actualAmount}</span>
+                    <span className="text-earth-500 font-bold">¥{Number(record.actualAmount) || 0}</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                     <div>

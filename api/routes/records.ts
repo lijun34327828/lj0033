@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express'
-import { db, parseJsonField } from '../database.js'
+import { db, parseJsonField, toCamelCase } from '../database.js'
 
 const router = Router()
 
@@ -26,8 +26,8 @@ router.get('/', (req: Request, res: Response): void => {
     const rows = db.prepare(sql).all(...params) as Array<Record<string, unknown>>
 
     const results = rows.map(row => ({
-      ...row,
-      extra_services: parseJsonField(row.extra_services as string, [])
+      ...toCamelCase(row),
+      extraServices: parseJsonField(row.extra_services as string, [])
     }))
 
     res.json({ success: true, data: results })
@@ -53,8 +53,8 @@ router.get('/:id', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        ...row,
-        extra_services: parseJsonField(row.extra_services as string, [])
+        ...toCamelCase(row),
+        extraServices: parseJsonField(row.extra_services as string, [])
       }
     })
   } catch (error) {

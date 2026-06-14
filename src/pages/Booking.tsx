@@ -39,6 +39,12 @@ export default function Booking() {
   }, [propertyId]);
 
   useEffect(() => {
+    if (currentProperty?.maxGuests) {
+      booking.setMaxGuests(currentProperty.maxGuests);
+    }
+  }, [currentProperty]);
+
+  useEffect(() => {
     if (propertyId) {
       fetchCalendar(propertyId, calYear, calMonth);
     }
@@ -58,10 +64,13 @@ export default function Booking() {
 
   const feeBreakdown = useMemo(() => {
     if (!currentProperty) return { room: 0, extraGuest: 0, services: 0, total: 0 };
-    const room = nights * currentProperty.basePrice;
-    const extraGuests = Math.max(0, booking.guests - currentProperty.baseGuests);
-    const extraGuest = extraGuests * nights * currentProperty.extraGuestPrice;
-    const services = booking.extraServices.reduce((s, sv) => s + sv.price * sv.quantity, 0);
+    const basePrice = Number(currentProperty.basePrice) || 0;
+    const baseGuests = Number(currentProperty.baseGuests) || 0;
+    const extraGuestPrice = Number(currentProperty.extraGuestPrice) || 0;
+    const room = nights * basePrice;
+    const extraGuests = Math.max(0, booking.guests - baseGuests);
+    const extraGuest = extraGuests * nights * extraGuestPrice;
+    const services = booking.extraServices.reduce((s, sv) => s + (Number(sv.price) || 0) * (Number(sv.quantity) || 0), 0);
     return { room, extraGuest, services, total: room + extraGuest + services };
   }, [currentProperty, nights, booking.guests, booking.extraServices]);
 
@@ -245,14 +254,14 @@ export default function Booking() {
               </button>
               <span className="text-xl font-semibold text-earth-900 w-12 text-center">{booking.guests}</span>
               <button
-                onClick={() => booking.setGuests(booking.guests + 1)}
-                disabled={booking.guests >= currentProperty.maxGuests}
+                onClick={() => booking.setGuests(booking.guests + 1, currentProperty.maxGuests)}
+                disabled={booking.guests >= (currentProperty.maxGuests || Infinity)}
                 className="p-2 rounded-lg border border-earth-200 hover:bg-earth-50 disabled:opacity-30 transition-all duration-200"
               >
                 <Plus className="w-4 h-4" />
               </button>
               <span className="text-sm text-earth-400">
-                (基础{currentProperty.baseGuests}人，最多{currentProperty.maxGuests}人)
+                (基础{currentProperty.baseGuests || 0}人，最多{currentProperty.maxGuests || 0}人)
               </span>
             </div>
           </div>
@@ -310,26 +319,26 @@ export default function Booking() {
             <h2 className="font-serif text-lg font-semibold text-earth-900 mb-4">费用明细</h2>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-earth-500">房费 ({nights}晚 × ¥{currentProperty.basePrice})</span>
-                <span className="text-earth-800">¥{feeBreakdown.room}</span>
+                <span className="text-earth-500">房费 ({nights}晚 × ¥{Number(currentProperty.basePrice) || 0})</span>
+                <span className="text-earth-800">¥{feeBreakdown.room || 0}</span>
               </div>
               {feeBreakdown.extraGuest > 0 && (
                 <div className="flex justify-between">
                   <span className="text-earth-500">
-                    加人费 ({booking.guests - currentProperty.baseGuests}人 × {nights}晚 × ¥{currentProperty.extraGuestPrice})
+                    加人费 ({Math.max(0, booking.guests - (Number(currentProperty.baseGuests) || 0))}人 × {nights}晚 × ¥{Number(currentProperty.extraGuestPrice) || 0})
                   </span>
-                  <span className="text-earth-800">¥{feeBreakdown.extraGuest}</span>
+                  <span className="text-earth-800">¥{feeBreakdown.extraGuest || 0}</span>
                 </div>
               )}
               {feeBreakdown.services > 0 && (
                 <div className="flex justify-between">
                   <span className="text-earth-500">增值服务</span>
-                  <span className="text-earth-800">¥{feeBreakdown.services}</span>
+                  <span className="text-earth-800">¥{feeBreakdown.services || 0}</span>
                 </div>
               )}
               <div className="border-t border-earth-100 pt-3 flex justify-between">
                 <span className="font-semibold text-earth-800">合计</span>
-                <span className="text-xl font-bold text-earth-500">¥{feeBreakdown.total}</span>
+                <span className="text-xl font-bold text-earth-500">¥{feeBreakdown.total || 0}</span>
               </div>
             </div>
             <button

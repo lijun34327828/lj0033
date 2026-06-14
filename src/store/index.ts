@@ -280,11 +280,13 @@ interface BookingState {
   checkIn: string;
   checkOut: string;
   guests: number;
+  maxGuests: number | null;
   extraServices: ExtraServiceItem[];
   isAvailable: boolean | null;
   setCheckIn: (date: string) => void;
   setCheckOut: (date: string) => void;
-  setGuests: (count: number) => void;
+  setGuests: (count: number, max?: number) => void;
+  setMaxGuests: (max: number) => void;
   addService: (service: ExtraServiceCatalog) => void;
   removeService: (id: string) => void;
   updateServiceQuantity: (id: string, quantity: number) => void;
@@ -296,11 +298,16 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   checkIn: "",
   checkOut: "",
   guests: 1,
+  maxGuests: null,
   extraServices: [],
   isAvailable: null,
   setCheckIn: (date) => set({ checkIn: date, isAvailable: null }),
   setCheckOut: (date) => set({ checkOut: date, isAvailable: null }),
-  setGuests: (count) => set({ guests: Math.max(1, count) }),
+  setGuests: (count, max) => {
+    const upperBound = max ?? get().maxGuests ?? Infinity;
+    set({ guests: Math.max(1, Math.min(count, upperBound)) });
+  },
+  setMaxGuests: (max) => set({ maxGuests: max }),
   addService: (service) =>
     set((state) => ({
       extraServices: [
@@ -337,7 +344,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     }
   },
   reset: () =>
-    set({ checkIn: "", checkOut: "", guests: 1, extraServices: [], isAvailable: null }),
+    set({ checkIn: "", checkOut: "", guests: 1, maxGuests: null, extraServices: [], isAvailable: null }),
 }));
 
 interface ExtraServiceState {
